@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 type ArticleBlockProps = {
@@ -13,13 +14,15 @@ type ArticleBlockProps = {
 
 const ArticleBlock = ({ article }: ArticleBlockProps) => {
   return (
-    <Block>
-      <b>
-        <span className='article-id'>{article.id}. </span>
-        {article.title}
-      </b>
-      <p className='article-content'>{article.content}</p>
-    </Block>
+    <StyledLink to={`/${article.type}?id=${article.id}`}>
+      <Block>
+        <b>
+          <span className='article-id'>{article.id}. </span>
+          {article.title}
+        </b>
+        <p className='article-content'>{article.content}</p>
+      </Block>
+    </StyledLink>
   );
 };
 
@@ -34,5 +37,18 @@ const Block = styled.section`
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
+  }
+`;
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: black;
+
+  &:focus,
+  &:hover,
+  &:visited,
+  &:link,
+  &:active {
+    text-decoration: none;
   }
 `;

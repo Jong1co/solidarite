@@ -5,6 +5,7 @@ import instance from "../app/instance";
 import ArticleBlock from "../components/ArticleBlock";
 import { useRecoilState } from "recoil";
 import { recoilArticleState, ArticleType } from "../app/states/recoilArticleState";
+import { useQuery } from "react-query";
 
 const Home = () => {
   const [mode, setMode] = useState<ArticleType>("a");
