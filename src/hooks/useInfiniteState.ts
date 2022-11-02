@@ -1,24 +1,27 @@
 import { useInfiniteQuery } from "react-query";
 import { ArticleType, Article } from "../pages/Home";
-import instance from "../app/instance";
+import instance from "../utils/instance";
+import useDebounce from "./useDebounce";
 
 type QueryFunc = {
   data: Article[];
   nextPage: number;
 };
 
-const getArticle = async (mode: ArticleType, page: number, keyword: string) => {
-  const { data } = await instance.get(`/${mode}-posts?page=${page}&search=${keyword}`);
-  return { data, nextPage: page + 1 };
-};
-
 const useInfiniteState = (queryKey: string, mode: ArticleType, keyword: string) => {
-  const { fetchNextPage, isFetching, data, hasNextPage } = useInfiniteQuery(queryKey, ({ pageParam = 0 }) => getArticle(mode, pageParam, keyword), {
+  /** 150ms 지연되어 나온 keyword */
+  const debouncedKeyword = useDebounce(keyword, 150);
+
+  const getArticle = async (mode: ArticleType, page: number, keyword: string): Promise<QueryFunc> => {
+    const { data } = await instance.get(`/${mode}-posts?page=${page}&search=${keyword}`);
+    return { data, nextPage: page + 1 };
+  };
+
+  const { fetchNextPage, data, hasNextPage } = useInfiniteQuery([queryKey, debouncedKeyword], ({ pageParam = 0 }) => getArticle(mode, pageParam, keyword), {
     getNextPageParam: (lastPage) => lastPage.data.length > 0 && lastPage.nextPage,
     refetchOnWindowFocus: false,
   });
 
-  const loadNextArticleList = () => fetchNextPage();
   const everyPageArticleList: Article[] | undefined = data?.pages.map((page) => page.data).flat();
   return [fetchNextPage, everyPageArticleList, hasNextPage];
 };
