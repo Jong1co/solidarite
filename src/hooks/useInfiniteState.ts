@@ -1,19 +1,26 @@
 import { useInfiniteQuery } from "react-query";
 import { ArticleType, Article } from "../pages/Home";
+import instance from "../app/instance";
 
 type QueryFunc = {
   data: Article[];
   nextPage: number;
 };
 
-const useInfiniteState = (queryKey: string, mode: ArticleType, queryFunc: any) => {
-  const articleList = useInfiniteQuery(queryKey, ({ pageParam = 0 }) => queryFunc(mode, pageParam), {
-    getNextPageParam: (last) => last.nextPage,
+const getArticle = async (mode: ArticleType, page: number, keyword: string) => {
+  const { data } = await instance.get(`/${mode}-posts?page=${page}&search=${keyword}`);
+  return { data, nextPage: page + 1 };
+};
+
+const useInfiniteState = (queryKey: string, mode: ArticleType, keyword: string) => {
+  const { fetchNextPage, isFetching, data, hasNextPage } = useInfiniteQuery(queryKey, ({ pageParam = 0 }) => getArticle(mode, pageParam, keyword), {
+    getNextPageParam: (lastPage) => lastPage.data.length > 0 && lastPage.nextPage,
     refetchOnWindowFocus: false,
   });
-  const loadNextArticleList = () => articleList.fetchNextPage();
-  const everyPageArticleList: Article[] | undefined = articleList.data?.pages.map((page) => page.data).flat();
-  return [loadNextArticleList, everyPageArticleList];
+
+  const loadNextArticleList = () => fetchNextPage();
+  const everyPageArticleList: Article[] | undefined = data?.pages.map((page) => page.data).flat();
+  return [fetchNextPage, everyPageArticleList, hasNextPage];
 };
 
 export default useInfiniteState;

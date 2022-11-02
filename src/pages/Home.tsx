@@ -3,7 +3,7 @@ import Navbar from "../components/NavBar";
 import Layout from "../layout/Layout";
 import instance from "../app/instance";
 import ArticleBlock from "../components/ArticleBlock";
-import { useQueries, useQuery, useInfiniteQuery } from "react-query";
+import { useQueries, useQuery, useInfiniteQuery, useQueryClient } from "react-query";
 import useInfiniteState from "../hooks/useInfiniteState";
 import { useInView } from "react-intersection-observer";
 
@@ -22,17 +22,24 @@ const Home = () => {
   const [keyword, setKeyword] = useState("");
   const [ref, inView] = useInView();
 
-  const getArticle = async (mode: ArticleType, page: number) => {
-    const { data } = await instance.get(`/${mode}-posts?page=${page}`);
-    return { data, nextPage: page + 1 };
-  };
+  // const queryClient = useQueryClient();
 
-  const [loadNextA, pageAList]: any = useInfiniteState("infiniteArticleA", "a", getArticle);
-  const [loadNextB, pageBList]: any = useInfiniteState("infiniteArticleB", "b", getArticle);
+  // useEffect(() => {
+  //   queryClient.invalidateQueries();
+  // }, [keyword]);
+
+  const [loadNextA, pageAList, hasNextPageA]: any = useInfiniteState("infiniteArticleA", "a", keyword);
+  const [loadNextB, pageBList, hasNextPageB]: any = useInfiniteState("infiniteArticleB", "b", keyword);
 
   const page = mode === "a" ? pageAList : pageBList;
 
-  if (inView) mode === "a" ? loadNextA() : loadNextB();
+  if (inView) {
+    if (mode === "a" && hasNextPageA) {
+      loadNextA();
+    } else if (mode === "b" && hasNextPageB) {
+      loadNextB();
+    }
+  }
 
   return (
     <Layout>
@@ -43,18 +50,6 @@ const Home = () => {
           setKeyword(e.target.value);
         }}
       />
-      <button
-        onClick={() => {
-          loadNextA();
-        }}>
-        page up!A
-      </button>
-      <button
-        onClick={() => {
-          loadNextB();
-        }}>
-        page up!B
-      </button>
       <Navbar setMode={setMode} />
       <main>
         {page?.map((article: Article) => {
