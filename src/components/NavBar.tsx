@@ -1,28 +1,38 @@
-import React from "react";
+import { memo } from "react";
+import { ArticleType } from "../typings";
 
-type ArticleType = "a" | "b";
+type NavbarType = {
+  mode: ArticleType;
+  title: string;
+};
 
 type NavbarProps = {
   setMode: (value: ArticleType) => void;
 };
 
 const Navbar = ({ setMode }: NavbarProps) => {
+  console.log("nav");
+
+  const navbarType: NavbarType[] = [
+    { mode: "a", title: "A Posts" },
+    { mode: "b", title: "B Posts" },
+  ];
+
   return (
     <nav>
-      <button
-        onClick={() => {
-          setMode("a");
-        }}>
-        A Posts
-      </button>
-      <button
-        onClick={() => {
-          setMode("b");
-        }}>
-        B Posts
-      </button>
+      {navbarType.map(({ mode, title }) => {
+        return (
+          <button
+            key={title}
+            onClick={() => {
+              setMode(mode);
+            }}>
+            {title}
+          </button>
+        );
+      })}
     </nav>
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

@@ -1,15 +1,10 @@
-import React from "react";
+import { memo } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { Article } from "../typings";
 
 type ArticleBlockProps = {
-  article: {
-    id: string; // 게시물 ID
-    title: string; // 게시물 제목
-    content: string; // 게시물 내용
-    type: "a" | "b"; // a or b
-    createdAt: string; // 게시물 생성일 (의미없음)}
-  };
+  article: Article;
 };
 
 const ArticleBlock = ({ article }: ArticleBlockProps) => {
@@ -26,7 +21,7 @@ const ArticleBlock = ({ article }: ArticleBlockProps) => {
   );
 };
 
-export default ArticleBlock;
+export default memo(ArticleBlock);
 
 const Block = styled.section`
   .article-id {
