@@ -4,6 +4,7 @@ import Layout from "../layout/Layout";
 import instance from "../app/instance";
 import ArticleBlock from "../components/ArticleBlock";
 import { useQueries, useQuery, useInfiniteQuery } from "react-query";
+import useInfiniteState from "../hooks/useInfiniteState";
 
 export type Article = {
   id: string; // 게시물 ID
@@ -18,24 +19,15 @@ export type ArticleType = "a" | "b";
 const Home = () => {
   const [mode, setMode] = useState<ArticleType>("a");
   const [keyword, setKeyword] = useState("");
-  const [page, setPage] = useState({ a: 0, b: 0 });
 
   const getArticle = async (mode: ArticleType, page: number) => {
     const { data } = await instance.get(`/${mode}-posts?page=${page}`);
     return { data, nextPage: page + 1 };
   };
 
-  const resultA = useInfiniteQuery("infiniteArticleA", ({ pageParam = 0 }) => getArticle("a", pageParam), {
-    getNextPageParam: (last) => last.nextPage,
-    refetchOnWindowFocus: false,
-  });
-
-  const resultB = useInfiniteQuery("infiniteArticleB", ({ pageParam = 0 }) => getArticle("b", pageParam), {
-    getNextPageParam: (last) => last.nextPage,
-    refetchOnWindowFocus: false,
-  });
-
-  console.log(resultA.data?.pages.map((page) => page.data).flat());
+  const [loadNextA, pageAList]: any = useInfiniteState("infiniteArticleA", "a", getArticle);
+  const [loadNextB, pageBList]: any = useInfiniteState("infiniteArticleB", "b", getArticle);
+  const page = mode === "a" ? pageAList : pageBList;
 
   return (
     <Layout>
@@ -48,21 +40,21 @@ const Home = () => {
       />
       <button
         onClick={() => {
-          resultA.fetchNextPage();
+          loadNextA();
         }}>
         page up!A
       </button>
       <button
         onClick={() => {
-          resultB.fetchNextPage();
+          loadNextB();
         }}>
         page up!B
       </button>
       <Navbar setMode={setMode} />
       <main>
-        {/* {data?.map((article) => {
+        {page?.map((article: Article) => {
           return <ArticleBlock article={article} key={`${article.type}${article.id}`} />;
-        })} */}
+        })}
       </main>
     </Layout>
   );
