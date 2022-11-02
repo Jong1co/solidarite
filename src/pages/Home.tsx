@@ -5,6 +5,7 @@ import instance from "../app/instance";
 import ArticleBlock from "../components/ArticleBlock";
 import { useQueries, useQuery, useInfiniteQuery } from "react-query";
 import useInfiniteState from "../hooks/useInfiniteState";
+import { useInView } from "react-intersection-observer";
 
 export type Article = {
   id: string; // 게시물 ID
@@ -19,6 +20,7 @@ export type ArticleType = "a" | "b";
 const Home = () => {
   const [mode, setMode] = useState<ArticleType>("a");
   const [keyword, setKeyword] = useState("");
+  const [ref, inView] = useInView();
 
   const getArticle = async (mode: ArticleType, page: number) => {
     const { data } = await instance.get(`/${mode}-posts?page=${page}`);
@@ -27,7 +29,10 @@ const Home = () => {
 
   const [loadNextA, pageAList]: any = useInfiniteState("infiniteArticleA", "a", getArticle);
   const [loadNextB, pageBList]: any = useInfiniteState("infiniteArticleB", "b", getArticle);
+
   const page = mode === "a" ? pageAList : pageBList;
+
+  if (inView) mode === "a" ? loadNextA() : loadNextB();
 
   return (
     <Layout>
@@ -55,6 +60,7 @@ const Home = () => {
         {page?.map((article: Article) => {
           return <ArticleBlock article={article} key={`${article.type}${article.id}`} />;
         })}
+        <div ref={ref} />
       </main>
     </Layout>
   );
