@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import instance from "../app/instance";
-import { Article } from "../app/states/recoilArticleState";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import instance from "../utils/instance";
+import { Article } from "../typings";
 
 const Detail = () => {
-  const [searchParams, _] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { mode } = useParams();
   const id = searchParams.get("id");
   const [article, setArticle] = useState({} as Article);

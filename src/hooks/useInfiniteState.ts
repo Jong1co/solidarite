@@ -1,5 +1,5 @@
 import { useInfiniteQuery } from "react-query";
-import { ArticleType, Article } from "../pages/Home";
+import { ArticleType, Article } from "../typings";
 import instance from "../utils/instance";
 import useDebounce from "./useDebounce";
 
