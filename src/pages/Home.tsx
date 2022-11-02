@@ -1,32 +1,30 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../components/NavBar";
 import Layout from "../layout/Layout";
 import instance from "../app/instance";
 import ArticleBlock from "../components/ArticleBlock";
-
-type ArticleType = "a" | "b";
-
-type Article = {
-  id: string; // 게시물 ID
-  title: string; // 게시물 제목
-  content: string; // 게시물 내용
-  type: ArticleType; // a or b
-  createdAt: string; // 게시물 생성일 (의미없음)
-};
+import { useRecoilState } from "recoil";
+import { recoilArticleState, ArticleType } from "../app/states/recoilArticleState";
 
 const Home = () => {
   const [mode, setMode] = useState<ArticleType>("a");
   const [keyword, setKeyword] = useState("");
-  const [articleList, setArticleList] = useState<Article[]>([]);
+  const [recoilState, setRecoilState] = useRecoilState(recoilArticleState);
+  const page = mode === "a" ? recoilState.a.page : recoilState.b.page;
 
   useEffect(() => {
-    getArticle(0);
-  }, []);
+    if (recoilState[mode].articleList.length === 0) getArticle(0);
+  }, [mode]);
+
+  useEffect(() => {
+    getArticle(page);
+  }, [recoilState.a.page, recoilState.b.page]);
 
   const getArticle = async (page: number) => {
     const { data } = await instance.get(`/${mode}-posts?page=${page}`);
-    setArticleList(data);
+    setRecoilState((prev) => ({ ...prev, [mode]: { ...recoilState[mode], articleList: [...recoilState[mode].articleList, ...data] } }));
   };
+
   return (
     <Layout>
       <input
@@ -36,9 +34,15 @@ const Home = () => {
           setKeyword(e.target.value);
         }}
       />
+      <button
+        onClick={() => {
+          setRecoilState((prev) => ({ ...prev, [mode]: { ...recoilState[mode], page: recoilState[mode].page + 1 } }));
+        }}>
+        page up!
+      </button>
       <Navbar setMode={setMode} />
       <main>
-        {articleList.map((article) => {
+        {recoilState[mode].articleList.map((article) => {
           return <ArticleBlock article={article} key={`${article.type}${article.id}`} />;
         })}
       </main>
