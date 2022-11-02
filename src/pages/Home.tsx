@@ -6,6 +6,7 @@ import ArticleBlock from "../components/ArticleBlock";
 import { useQueries, useQuery, useInfiniteQuery, useQueryClient } from "react-query";
 import useInfiniteState from "../hooks/useInfiniteState";
 import { useInView } from "react-intersection-observer";
+import useThrottle from "../hooks/useThrottle";
 
 export type Article = {
   id: string; // 게시물 ID
@@ -18,28 +19,46 @@ export type Article = {
 export type ArticleType = "a" | "b";
 
 const Home = () => {
-  const [mode, setMode] = useState<ArticleType>("a");
+  const [mode, setMode] = useState<ArticleType>(sessionStorage.mode || "a");
+
   const [keyword, setKeyword] = useState("");
   const [ref, inView] = useInView();
+  const [throttle, setThrottle] = useThrottle(false, 50);
+
+  useEffect(() => {
+    setThrottle();
+  }, []);
 
   // const queryClient = useQueryClient();
 
   // useEffect(() => {
-  //   queryClient.invalidateQueries();
+  // queryClient.invalidateQueries();
   // }, [keyword]);
 
+  /**
+   * 데이터를 두 번씩 요청하는 현상
+   * 첫 화면 렌더링 시 0번 페이지 뿐만 아니라 1번까지 요청하는 현상
+   * => 요청 후 딜레이 필요 => 쓰로틀링으로 하면 될듯
+   */
   const [loadNextA, pageAList, hasNextPageA]: any = useInfiniteState("infiniteArticleA", "a", keyword);
   const [loadNextB, pageBList, hasNextPageB]: any = useInfiniteState("infiniteArticleB", "b", keyword);
 
   const page = mode === "a" ? pageAList : pageBList;
 
-  if (inView) {
+  if (inView && throttle) {
     if (mode === "a" && hasNextPageA) {
       loadNextA();
+      setThrottle();
     } else if (mode === "b" && hasNextPageB) {
       loadNextB();
+      setThrottle();
     }
   }
+
+  /** 어떻게 스토리지에 저장 안 하고 b post에 남아있을까? query때문인가 */
+  useEffect(() => {
+    sessionStorage.setItem("mode", mode);
+  }, [mode]);
 
   return (
     <Layout>
