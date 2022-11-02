@@ -23,7 +23,13 @@ const ArticleBlock = ({ article }: ArticleBlockProps) => {
 
 export default memo(ArticleBlock);
 
-const Block = styled.section`
+const Block = styled.li`
+  border-radius: 8px;
+  padding: 24px 16px 16px 16px;
+  transition: 0.2s all;
+  &:hover {
+    background-color: #f1f1f1;
+  }
   .article-id {
     color: #3b82f6;
   }
