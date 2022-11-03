@@ -40,11 +40,9 @@ const Detail = () => {
 export default Detail;
 
 const DetailContent = styled.section`
-  width: 100%;
-  height: 100%;
   border: 1px solid lightgray;
   border-radius: 8px;
-  margin: 64px 0 16px 0;
+  margin: 64px 16px 16px 16px;
   padding: 24px;
   box-shadow: 0 0 3px #3b82f6;
 
@@ -59,7 +57,7 @@ const DetailButton = styled.button`
   border-radius: 8px;
   background-color: #3b82f6;
   color: #f5f5f5;
-  margin: 8px 0;
+  margin: 8px 16px;
   padding: 16px;
   cursor: pointer;
   letter-spacing: 2px;
