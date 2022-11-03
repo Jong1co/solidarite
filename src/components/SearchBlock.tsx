@@ -22,7 +22,7 @@ const SearchBlock = ({ keyword, setKeyword }: SearchBlockProps) => {
       />
       <FontAwesomeIcon
         icon={faX}
-        className='search-cancel'
+        className={`search-cancel ${keyword !== "" && "activity"}`}
         onClick={() => {
           setKeyword("");
         }}
@@ -63,6 +63,9 @@ const SearchBlockBox = styled.section`
     right: -50px;
     color: gray;
     display: none;
+  }
+  .activity {
+    display: block;
   }
   .search-bar {
     margin: 16px;

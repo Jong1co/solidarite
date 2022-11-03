@@ -3,32 +3,34 @@ import styled from "styled-components";
 import { ArticleType } from "../typings";
 
 type NavbarType = {
-  mode: ArticleType;
+  type: ArticleType;
   title: string;
 };
 
 type NavbarProps = {
+  mode: ArticleType;
   setMode: (value: ArticleType) => void;
 };
 
-const Navbar = ({ setMode }: NavbarProps) => {
+const Navbar = ({ mode, setMode }: NavbarProps) => {
   const navbarType: NavbarType[] = [
-    { mode: "a", title: "A Posts" },
-    { mode: "b", title: "B Posts" },
+    { type: "a", title: "A Posts" },
+    { type: "b", title: "B Posts" },
   ];
 
   return (
     <NavBox>
       <nav>
-        {navbarType.map(({ mode, title }) => {
+        {navbarType.map(({ type, title }) => {
           return (
-            <button
+            <NavButton
               key={title}
+              className='nav-button'
               onClick={() => {
-                setMode(mode);
+                setMode(type);
               }}>
-              {title}
-            </button>
+              <b className={`${mode === type ? "selected" : ""}`}>{title}</b>
+            </NavButton>
           );
         })}
         <Line />
@@ -43,7 +45,23 @@ const NavBox = styled.section`
   margin: 16px;
 `;
 
+const NavButton = styled.button`
+  background-color: transparent;
+  border: none;
+  height: 40px;
+  width: 80px;
+  transition: 0.3s all;
+  .selected {
+    color: #3b82f6;
+  }
+  &:hover {
+    background-color: #ebebeb;
+    border-radius: 8px 8px 0 0;
+    color: #3b82f6;
+  }
+`;
+
 const Line = styled.div`
   border-top: 1px solid lightgray;
-  margin: 16px;
+  margin: 0 0 16px 0;
 `;

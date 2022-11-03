@@ -9,7 +9,7 @@ const Layout = ({ children }: LayoutProps) => {
   return <StyledLayout>{children}</StyledLayout>;
 };
 
-const StyledLayout = styled.div`
+const StyledLayout = styled.main`
   width: 100%;
   max-width: 1000px;
   margin: auto;

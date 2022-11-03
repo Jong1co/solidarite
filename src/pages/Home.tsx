@@ -8,7 +8,6 @@ import useThrottle from "../hooks/useThrottle";
 import { useRecoilState } from "recoil";
 import modeState from "../atom/modeState";
 import keywordState from "../atom/keywordState";
-import styled from "styled-components";
 import ArticleBox from "../components/ArticleBox";
 
 const Home = () => {
@@ -36,17 +35,11 @@ const Home = () => {
 
   return (
     <Layout>
-      <Main>
-        <SearchBlock keyword={keyword} setKeyword={setKeyword} />
-        <Navbar setMode={setMode} />
-        <ArticleBox view={ref} page={page} inViewTarget={inViewTarget} />
-      </Main>
+      <SearchBlock keyword={keyword} setKeyword={setKeyword} />
+      <Navbar mode={mode} setMode={setMode} />
+      <ArticleBox view={ref} page={page} inViewTarget={inViewTarget} />
     </Layout>
   );
 };
 
 export default Home;
-
-const Main = styled.main`
-  margin: 16px;
-`;
