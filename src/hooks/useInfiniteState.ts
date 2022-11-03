@@ -8,7 +8,7 @@ type QueryFunc = {
   nextPage: number;
 };
 
-const useInfiniteState = (queryKey: string, mode: ArticleType, keyword: string) => {
+const useInfiniteState = (queryKey: string, mode: ArticleType, keyword: string): [() => void, Article[] | undefined, boolean | undefined] => {
   /** 150ms 지연되어 나온 keyword */
   const debouncedKeyword = useDebounce(keyword, 150);
 
@@ -20,6 +20,7 @@ const useInfiniteState = (queryKey: string, mode: ArticleType, keyword: string) 
   const { fetchNextPage, data, hasNextPage } = useInfiniteQuery([queryKey, debouncedKeyword], ({ pageParam = 0 }) => getArticle(mode, pageParam, keyword), {
     getNextPageParam: (lastPage) => lastPage.data.length > 0 && lastPage.nextPage,
     refetchOnWindowFocus: false,
+    staleTime: 30000,
   });
 
   const everyPageArticleList: Article[] | undefined = data?.pages.map((page) => page.data).flat();
